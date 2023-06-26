@@ -35,10 +35,11 @@ slash_path = '/'+path
 
 print("Target URL: ", url, "\n")
 
+print('Fuzzing via URL....')
 for payload in payloads:
 	try:
 		full_url2 = url+slash_path+payload
-		req = requests.get(full_url2 , allow_redirects=False , verify = False , timeout = 5)
+		req = requests.get(full_url2, allow_redirects=False , verify = False , timeout = 5)
 		url_fuzzer_output(full_url2, str(req.status_code))
 
 	except Exception:
@@ -63,36 +64,45 @@ for payload in payloads:
 		pass
 
 
-
+print('Fuzzing via HTTP Headers....')
 r1 = requests.get(full_url, headers={"X-Original-URL":path} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' +"(X-Original-URL: "+ path + ')' + ' : ' + str(r1.status_code))
+if ((str(r1.status_code)) != '404'):
+	print(full_url + ' : ' +"(X-Original-URL: "+ path + ')' + ' : ' + str(r1.status_code))
 
 r2 = requests.get(full_url, headers={"X-Custom-IP-Authorization" : "127.0.0.1"} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Custom-IP-Authorization: 127.0.0.1" + ')'+ ' : ' + str(r2.status_code))
+if ((str(r2.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Custom-IP-Authorization: 127.0.0.1" + ')'+ ' : ' + str(r2.status_code))
 
 r3 = requests.get(full_url, headers={"X-Forwarded-For": "http://127.0.0.1"} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Forwarded-For: http://127.0.0.1" + ')'+ ' : ' + str(r3.status_code))
+if ((str(r3.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Forwarded-For: http://127.0.0.1" + ')'+ ' : ' + str(r3.status_code))
 
 r4 = requests.get(full_url, headers={"X-Forwarded-For": "127.0.0.1:80"} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Forwarded-For: 127.0.0.1:80" + ')'+ ' : ' + str(r4.status_code))
+if ((str(r4.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Forwarded-For: 127.0.0.1:80" + ')'+ ' : ' + str(r4.status_code))
 
 r5 = requests.get(url, headers={"X-rewrite-url": slash_path} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-rewrite-url: {}".format(slash_path) + ')'+ ' : ' + str(r5.status_code))
+if ((str(r5.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-rewrite-url: {}".format(slash_path) + ')'+ ' : ' + str(r5.status_code))
 
 r6 = requests.get(full_url, headers={'X-Forwarded-Host':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Forwarded-Host:127.0.0.1" + ')'+ ' : ' + str(r6.status_code))
+if ((str(r6.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Forwarded-Host:127.0.0.1" + ')'+ ' : ' + str(r6.status_code))
 
 r7 = requests.get(full_url, headers={'X-Host':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Host:127.0.0.1" + ')'+ ' : ' + str(r7.status_code))
+if ((str(r7.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Host:127.0.0.1" + ')'+ ' : ' + str(r7.status_code))
 
 r8 = requests.get(full_url, headers={'X-Remote-IP':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Remote-IP:127.0.0.1" + ')'+ ' : ' + str(r8.status_code))
+if ((str(r8.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Remote-IP:127.0.0.1" + ')'+ ' : ' + str(r8.status_code))
 
 r9 = requests.get(full_url, headers={'X-Originating-IP':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-print(full_url + ' : ' + "(X-Originating-IP:127.0.0.1" + ')'+ ' : ' + str(r9.status_code))
+if ((str(r9.status_code)) != '404'):
+	print(full_url + ' : ' + "(X-Originating-IP:127.0.0.1" + ')'+ ' : ' + str(r9.status_code))
 
 
-
+print('Fuzzing via HTTP Methods....')
 with open('./modules/payloads/http_methods.txt') as methods:
 	for method in methods:
 		method = method.strip('\n')
