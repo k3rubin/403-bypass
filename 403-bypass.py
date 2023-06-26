@@ -33,10 +33,10 @@ payloads = ["/","/*","/%2f/","/./","./.","/*/","?","??","&","#","%","%20","%09",
 full_url = url+'/'+path
 slash_path = '/'+path
 
-print("Target URL: ", url, "\n")
+print("Target URL: ", url)
 
 # TODO - Implement code reuse
-print('Fuzzing via URL....')
+print("\n", "Fuzzing via URL....", "\n")
 for payload in payloads:
 	try:
 		full_url2 = url+slash_path+payload
@@ -65,7 +65,7 @@ for payload in payloads:
 		pass
 
 # TODO - Implement code reuse, put header payloads to a list then iterate them in a loop
-print('Fuzzing via HTTP Headers....')
+print("\n", "Fuzzing via HTTP Headers....", "\n")
 r1 = requests.get(full_url, headers={"X-Original-URL":path} , allow_redirects=False , verify=False , timeout=5)
 if ((str(r1.status_code)) != '404'):
 	print(full_url + ' : ' +"(X-Original-URL: "+ path + ')' + ' : ' + str(r1.status_code))
@@ -103,7 +103,7 @@ if ((str(r9.status_code)) != '404'):
 	print(full_url + ' : ' + "(X-Originating-IP:127.0.0.1" + ')'+ ' : ' + str(r9.status_code))
 
 
-print('Fuzzing via HTTP Methods....')
+print("\n", "Fuzzing via HTTP Methods....", "\n")
 with open('./modules/payloads/http_methods.txt') as methods:
 	for method in methods:
 		method = method.strip('\n')
