@@ -35,6 +35,7 @@ slash_path = '/'+path
 
 print("Target URL: ", url, "\n")
 
+# TODO - Implement code reuse
 print('Fuzzing via URL....')
 for payload in payloads:
 	try:
@@ -63,7 +64,7 @@ for payload in payloads:
 	except Exception:
 		pass
 
-
+# TODO - Implement code reuse, put header payloads to a list then iterate them in a loop
 print('Fuzzing via HTTP Headers....')
 r1 = requests.get(full_url, headers={"X-Original-URL":path} , allow_redirects=False , verify=False , timeout=5)
 if ((str(r1.status_code)) != '404'):
