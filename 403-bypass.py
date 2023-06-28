@@ -1,7 +1,8 @@
 import requests
 import warnings
 import argparse
-from modules.utilities.request_outputs import url_fuzzer_output, http_method_fuzzer_output
+from modules.payloads.url_payloads import payloads
+from modules.utilities.fuzzer_outputs import url_fuzzer_output, http_method_fuzzer_output
 
 
 
@@ -27,8 +28,6 @@ args = parser.parse_args()
 url = args.url.rstrip('/')
 path = args.path
 extension = args.extension
-
-payloads = ["/","/*","/%2f/","/./","./.","/*/","?","??","&","#","%","%20","%09","%2500","/..;/","../","..%2f","..;/",".././","..%00/","..%0d","..%5c","..%ff/","%2e%2e%2f",".%2e/","%3f","%26","%23"]
 
 full_url = url+'/'+path
 slash_path = '/'+path

@@ -2,7 +2,7 @@ import requests
 import warnings
 import argparse
 from termcolor import colored
-from modules.utilities.request_outputs import url_fuzzer_output, http_method_fuzzer_output
+from modules.utilities.fuzzer_outputs import url_fuzzer_output, http_method_fuzzer_output
 
 warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 

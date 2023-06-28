@@ -11,4 +11,3 @@ def http_method_fuzzer_output(full_url, status_code, method):
 def header_fuzzer_output(full_url, status_code, payload_key, payload_value):
     if (status_code != '404'):
         return full_url + ' :  (' + payload_key + ': ' + payload_value + ') : ' + str(status_code)
-    
