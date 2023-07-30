@@ -82,3 +82,5 @@ print("\n", "Fuzzing via HTTP Methods....", "\n")
 for method in http_methods:
 	request = requests.request("{}".format(method), full_url, allow_redirects=False, verify=False, timeout= 5, params = query_string)
 	http_method_fuzzer_output(full_url, str(request.status_code), method)
+
+# TODO - Add color on results
